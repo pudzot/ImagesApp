@@ -21,16 +21,14 @@ struct ImageResponse:  Codable {
 
 struct Image: Codable {
     let id: String
-    //  let createdAt, updatedAt: Date
     let description: String?
+    let altDescription: String
     let urls: Urls
     
     enum CodingKeys: String, CodingKey {
         case id
-      //  case createdAt = "created_at"
-      //  case updatedAt = "updated_at"
         case description
-      //  case title = "alt_description"
+        case altDescription = "alt_description"
         case urls
         
     }
@@ -39,7 +37,7 @@ struct Image: Codable {
 // MARK: - Urls
 struct Urls: Codable {
     let full, regular, small: String
-
+    
     enum CodingKeys: String, CodingKey {
         case full, regular, small
         

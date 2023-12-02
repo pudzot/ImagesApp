@@ -7,15 +7,15 @@
 
 import Foundation
 
-protocol ImageInfoViewModelProtocol: AnyObject {
+protocol ImageDetailViewModelProtocol: AnyObject {
     var image: Image? { set get }
     var onFetchImageSucceed: (() -> Void)? { set get }
     var onFetchImageFailure: ((Error) -> Void)? { set get }
     func fetchImage(id: String)
 }
 
-final class ImageInfoViewModel: ImageInfoViewModelProtocol {
-
+final class ImageDetailViewModel: ImageDetailViewModelProtocol {
+    
     var image: Image?
     var onFetchImageSucceed: (() -> Void)?
     var onFetchImageFailure: ((Error) -> Void)?
@@ -27,17 +27,9 @@ final class ImageInfoViewModel: ImageInfoViewModelProtocol {
     }
     
     func fetchImage(id: String) {
-
-    }
-    
-}
-extension ImageInfoViewModel: ImagesViewControllerDelegate {
-    func tapImage(id: String) {
-        print(id)
         service.fetchImageInfo(id: id) { [weak self] result in
             switch result {
             case .success(let image):
-                print(image)
                 self?.image = image
                 self?.onFetchImageSucceed?()
             case .failure(let error):
@@ -47,4 +39,3 @@ extension ImageInfoViewModel: ImagesViewControllerDelegate {
         }
     }
 }
-

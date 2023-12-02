@@ -10,7 +10,7 @@ import UIKit
 
 class ImagesCollectionCell: UICollectionViewCell {
     
-     let img: UIImageView = {
+    let img: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill

@@ -18,13 +18,13 @@ final class ImagesDataService: ImagesDataServiceProtocol {
     // MARK: Types
 
     enum Endpoint: String {
-        case allImages = "/photos/?&client_id=e1pOaqyfU4_OIy9dfVQcjiRTdJoU0NJzt-Tr1-PwsIc&per_page=30"
+        case allImages = "/photos/"
         case searchImages = "/search/photos/?&client_id=e1pOaqyfU4_OIy9dfVQcjiRTdJoU0NJzt-Tr1-PwsIc&per_page=30"
-        case image = "/photos/?&client_id=e1pOaqyfU4_OIy9dfVQcjiRTdJoU0NJzt-Tr1-PwsIc"
     }
 
     // MARK: Properties
 
+    private let API_KEY = "?&client_id=e1pOaqyfU4_OIy9dfVQcjiRTdJoU0NJzt-Tr1-PwsIc"
     private let baseUrlString = "https://api.unsplash.com"
 
     private let urlSession: URLSession
@@ -38,7 +38,7 @@ final class ImagesDataService: ImagesDataServiceProtocol {
     // MARK: Methods
 
     func fetchDataImage(completion: @escaping (Result<[Image], Error>) -> Void) {
-        guard let url = URL(string: baseUrlString + Endpoint.allImages.rawValue) else { return }
+        guard let url = URL(string: baseUrlString + Endpoint.allImages.rawValue + API_KEY + "&per_page=30") else { return }
 
         urlSession.dataTask(with: url) { (data, response, error) in
             if let error = error {
@@ -46,7 +46,7 @@ final class ImagesDataService: ImagesDataServiceProtocol {
             }
 
             do {
-                let images = try JSONDecoder.userDecoder().decode([Image].self, from: data!)
+                let images = try JSONDecoder().decode([Image].self, from: data!)
                 completion(.success(images))
             } catch let err {
                 completion(.failure(err))
@@ -64,7 +64,7 @@ final class ImagesDataService: ImagesDataServiceProtocol {
             }
 
             do {
-                let images = try JSONDecoder.userDecoder().decode(ImageResponse.self, from: data!)
+                let images = try JSONDecoder().decode(ImageResponse.self, from: data!)
                 completion(.success(images))
             } catch let err {
                 completion(.failure(err))
@@ -73,7 +73,7 @@ final class ImagesDataService: ImagesDataServiceProtocol {
     }
     
     func fetchImageInfo(id: String, completion: @escaping (Result<Image, Error>) -> Void) {
-        guard let url = URL(string: baseUrlString + Endpoint.image.rawValue + "\(id)") else { return }
+        guard let url = URL(string: baseUrlString + Endpoint.allImages.rawValue + "\(id)" + API_KEY) else { return }
 
         urlSession.dataTask(with: url) { (data, response, error) in
             if let error = error {
@@ -81,18 +81,11 @@ final class ImagesDataService: ImagesDataServiceProtocol {
             }
 
             do {
-                let images = try JSONDecoder.userDecoder().decode(Image.self, from: data!)
-                print("zdjecie \(images)")
+                let images = try JSONDecoder().decode(Image.self, from: data!)
                 completion(.success(images))
             } catch let err {
                 completion(.failure(err))
             }
         }.resume()
-    }
-}
-
-extension JSONDecoder {
-    static func userDecoder() -> JSONDecoder {
-        JSONDecoder()
     }
 }

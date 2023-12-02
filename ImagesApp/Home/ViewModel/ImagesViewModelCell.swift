@@ -19,4 +19,3 @@ final class ImagesDefaultViewModelCell: ImagesViewModelCell {
         self.image = image
     }
 }
-

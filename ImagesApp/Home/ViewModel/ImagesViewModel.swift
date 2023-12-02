@@ -15,19 +15,17 @@ protocol ImagesViewModelProtocol: AnyObject {
 }
 
 final class ImagesViewModel: ImagesViewModelProtocol {
-
-        var images: [Image] = []
-        var onFetchImagesSucceed: (() -> Void)?
-        var onFetchImagesFailure: ((Error) -> Void)?
-
+    
+    var images: [Image] = []
+    var onFetchImagesSucceed: (() -> Void)?
+    var onFetchImagesFailure: ((Error) -> Void)?
+    
     private let service: ImagesDataServiceProtocol
-
+    
     init(service: ImagesDataServiceProtocol) {
         self.service = service
-
-       // fetchImages()
     }
-
+    
     func fetchImages() {
         service.fetchDataImage { [weak self] result in
             switch result {

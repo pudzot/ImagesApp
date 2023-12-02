@@ -7,15 +7,10 @@
 
 import UIKit
 
-protocol ImagesViewControllerDelegate {
-    func tapImage(id: String) 
-}
-
 class ImagesViewController: UIViewController {
-
+    
     private let viewModel: ImagesViewModel
     private let imagesView = ImagesCollectionView()
-    var delegate: ImagesViewControllerDelegate?
     
     init(viewModel: ImagesViewModel) {
         self.viewModel = viewModel
@@ -31,14 +26,13 @@ class ImagesViewController: UIViewController {
         title = "Gallery"
         view.backgroundColor = .systemBackground
         self.view = imagesView
-        
         NotificationCenter.default.addObserver(self, selector: #selector(showOfflineDeviceUI(notification:)), name: NSNotification.Name.connectivityStatus, object: nil)
         
         configureView()
         fetchImages()
         bindViewModelEvent()
     }
-
+    
     private func configureView() {
         imagesView.collectionView.delegate = self
         imagesView.collectionView.dataSource = self
@@ -63,20 +57,20 @@ class ImagesViewController: UIViewController {
     }
     
     @objc func showOfflineDeviceUI(notification: Notification) {
-            if NetworkMonitor.shared.isConnected {
-                print("Connected")
-            } else {
-                print("Not connected")
-                DispatchQueue.main.async {
-                    self.showAlertMessage(title: "Alert", message: "Please check your internet connection")
-                }
+        if NetworkMonitor.shared.isConnected {
+            print("Connected")
+        } else {
+            print("Not connected")
+            DispatchQueue.main.async {
+                self.showAlertMessage(title: "Alert", message: "Please check your internet connection")
             }
         }
-
+    }
+    
 }
 extension ImagesViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return viewModel.images.count
+        return viewModel.images.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -92,8 +86,12 @@ extension ImagesViewController: UICollectionViewDelegate, UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let image = viewModel.images[indexPath.row]
-        print(image.id)
-        delegate?.tapImage(id: image.id)
+        let service = ImagesDataService()
+        let vm = ImageDetailViewModel(service: service)
+        vm.image = image
+        let vc = ImageDetailController(viewModel: vm)
+        self.navigationController?.pushViewController(vc, animated: true)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -107,31 +105,15 @@ extension ImagesViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
 }
 extension ImagesViewController: UISearchResultsUpdating{
-
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
     }
     
     func updateSearchResults(for searchController: UISearchController) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-                    guard let query = searchController.searchBar.text else{return}
-                    print(query)
+            guard let query = searchController.searchBar.text else{return}
             self.viewModel.fetchImages(for: query)
         })
-//        guard let query = searchController.searchBar.text else{return}
-//        print(query)
-//        ApiCaller.shared.searchPhotos(for: query.trimmingCharacters(in: .whitespaces)) { results in
-//            switch results {
-//            case .success(let model):
-//                self.filteredPhotos = []
-//                self.filteredPhotos.append(contentsOf: model.results)
-//                DispatchQueue.main.async {
-//                    self.photosView.collectionView.reloadData()
-//                }
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//            }
-//        }
     }
-    
 }

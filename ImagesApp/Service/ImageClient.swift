@@ -19,7 +19,6 @@ final class ImageClient {
     init() {
         self.cachedImageForURL = [:]
     }
-    
 }
 
 extension ImageClient: ImageClientService {
@@ -27,7 +26,7 @@ extension ImageClient: ImageClientService {
     func setImage(from url: String, completion: @escaping (UIImage?) -> Void) {
         if let cacheImage = cachedImageForURL[url] {
             completion(cacheImage)
-            print("pobrano z cache")
+            print("get with cache")
         }else {
             let link = URL(string: url)!
             URLSession.shared.dataTask(with: link) { data, response, error in
@@ -38,7 +37,7 @@ extension ImageClient: ImageClientService {
                         let image = UIImage(data: data)
                         self.cachedImageForURL[url] = image
                         completion(self.cachedImageForURL[url])
-                        print("pobrano z URL")
+                        print("get with URL")
                     }
                 }
             }.resume()
